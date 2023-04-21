@@ -27,6 +27,8 @@ public class Main {
                 us.getAllUsers()) {
             System.out.println(user.toString());
         }
+        us.removeUserById(1L);
+        us.cleanUsersTable();
         us.dropUsersTable();
     }
 }

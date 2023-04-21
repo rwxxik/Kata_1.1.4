@@ -11,21 +11,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
+
+    private final String CREATE_TABLE_USERS = "CREATE TABLE IF NOT EXISTS myDbTest.users (" +
+            "id BIGINT NOT NULL AUTO_INCREMENT, " +
+            "name VARCHAR(45) NULL, " +
+            "lastName VARCHAR(45) NULL, " +
+            "age TINYINT NULL, " +
+            "UNIQUE INDEX id_UNIQUE (id ASC));";
+    private final String DROP_TABLE_USERS = "DROP TABLE IF EXISTS myDbTest.users;";
+    private final String SAVE_USER = "INSERT INTO myDbTest.users (name, lastName, age) VALUES (?, ?, ?);";
+    private final String REMOVE_USER_BY_ID = "DELETE FROM myDbTest.users WHERE id = ?";
+    private final String GET_ALL_USERS = "SELECT * FROM myDbTest.users;";
+    private final String CLEAN_TABLE_USERS = "DELETE FROM myDbTest.users;";
+
     public UserDaoJDBCImpl() {
 
     }
 
     public void createUsersTable() {
-        String createTable = "CREATE TABLE IF NOT EXISTS myDbTest.users (" +
-                "id INT NOT NULL AUTO_INCREMENT, " +
-                "name VARCHAR(45) NULL, " +
-                "lastName VARCHAR(45) NULL, " +
-                "age INT NULL, " +
-                "UNIQUE INDEX id_UNIQUE (id ASC));";
-
-
         try (Statement statement = Util.connection.createStatement()) {
-            statement.execute(createTable);
+            statement.execute(CREATE_TABLE_USERS);
             System.out.println("Table created or already exists.");
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -33,9 +38,8 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void dropUsersTable() {
-        String dropTable = "DROP TABLE IF EXISTS myDbTest.users;";
         try (Statement statement = Util.connection.createStatement()) {
-            statement.execute(dropTable);
+            statement.execute(DROP_TABLE_USERS);
             System.out.println("Table dropped.");
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -43,8 +47,7 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        String saveUser = "INSERT INTO myDbTest.users (name, lastName, age) VALUES (?, ?, ?);";
-        try (PreparedStatement preparedStatement = Util.connection.prepareStatement(saveUser)) {
+        try (PreparedStatement preparedStatement = Util.connection.prepareStatement(SAVE_USER)) {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setInt(3, age);
@@ -56,14 +59,19 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void removeUserById(long id) {
-
+        try (PreparedStatement preparedStatement = Util.connection.prepareStatement(REMOVE_USER_BY_ID)) {
+            preparedStatement.setLong(1, id);
+            preparedStatement.executeUpdate();
+            System.out.printf("User with id = %s was removed from database\n", id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<User> getAllUsers() {
-        String getAll = "SELECT * FROM myDbTest.users;";
         List<User> userList = new ArrayList();
         try (Statement statement = Util.connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(getAll);
+            ResultSet resultSet = statement.executeQuery(GET_ALL_USERS);
             while (resultSet.next()) {
                 Long id = (long) resultSet.getInt("id");
                 String name = resultSet.getString("name");
@@ -80,9 +88,8 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        String cleanTable = "DELETE FROM myDbTest.users;";
         try (Statement statement = Util.connection.createStatement()) {
-            statement.execute(cleanTable);
+            statement.execute(CLEAN_TABLE_USERS);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

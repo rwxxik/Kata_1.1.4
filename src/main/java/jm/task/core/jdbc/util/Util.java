@@ -10,7 +10,6 @@ public class Util {
     private static final String DB_USERNAME = "root";
     private static final String DB_PASSWORD = "root";
     public static Connection connection;
-    public static Statement statement;
 
     static {
         try {
