@@ -3,14 +3,13 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
+
+    private static Connection connection = Util.getConnection();
 
     private final String CREATE_TABLE_USERS = "CREATE TABLE IF NOT EXISTS myDbTest.users (" +
             "id BIGINT NOT NULL AUTO_INCREMENT, " +
@@ -29,7 +28,7 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void createUsersTable() {
-        try (Statement statement = Util.connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.execute(CREATE_TABLE_USERS);
             System.out.println("Table created or already exists.");
         } catch (SQLException e) {
@@ -38,7 +37,7 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void dropUsersTable() {
-        try (Statement statement = Util.connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.execute(DROP_TABLE_USERS);
             System.out.println("Table dropped.");
         } catch (SQLException e) {
@@ -47,7 +46,7 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        try (PreparedStatement preparedStatement = Util.connection.prepareStatement(SAVE_USER)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SAVE_USER)) {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setInt(3, age);
@@ -59,7 +58,7 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void removeUserById(long id) {
-        try (PreparedStatement preparedStatement = Util.connection.prepareStatement(REMOVE_USER_BY_ID)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(REMOVE_USER_BY_ID)) {
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
             System.out.printf("User with id = %s was removed from database\n", id);
@@ -70,7 +69,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList();
-        try (Statement statement = Util.connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(GET_ALL_USERS);
             while (resultSet.next()) {
                 Long id = (long) resultSet.getInt("id");
@@ -88,7 +87,7 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        try (Statement statement = Util.connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.execute(CLEAN_TABLE_USERS);
         } catch (SQLException e) {
             throw new RuntimeException(e);
