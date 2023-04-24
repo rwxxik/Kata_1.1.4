@@ -18,11 +18,11 @@ public class UserDaoJDBCImpl implements UserDao {
             "lastName VARCHAR(45) NULL, " +
             "age TINYINT NULL, " +
             "UNIQUE INDEX id_UNIQUE (id ASC));";
-    private final String DROP_TABLE_USERS = "DROP TABLE IF EXISTS myDbTest.users;";
-    private final String SAVE_USER = "INSERT INTO myDbTest.users (name, lastName, age) VALUES (?, ?, ?);";
-    private final String REMOVE_USER_BY_ID = "DELETE FROM myDbTest.users WHERE id = ?";
-    private final String GET_ALL_USERS = "SELECT * FROM myDbTest.users;";
-    private final String CLEAN_TABLE_USERS = "DELETE FROM myDbTest.users;";
+    private static final String DROP_TABLE_USERS = "DROP TABLE IF EXISTS myDbTest.users;";
+    private static final String SAVE_USER = "INSERT INTO myDbTest.users (name, lastName, age) VALUES (?, ?, ?);";
+    private static final String REMOVE_USER_BY_ID = "DELETE FROM myDbTest.users WHERE id = ?";
+    private static final String GET_ALL_USERS = "SELECT * FROM myDbTest.users;";
+    private static final String CLEAN_TABLE_USERS = "DELETE FROM myDbTest.users;";
 
     public UserDaoJDBCImpl() {
 
